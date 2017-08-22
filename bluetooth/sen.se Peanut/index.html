@@ -75,7 +75,7 @@
     <!-- Google Visualization API-->
      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <!--Java-Script document, see also-->
-    <!-- https://github.com/silulika/AutomatisierungPeanut/blob/gh-pages/bluetooth/sen.se%20Peanut/sen.se%20Peanut.js-->
+    <!-- https://github.com/Automatisierung/Peanut/blob/master/bluetooth/sen.se%20Peanut/sen.se%20Peanut.js-->
      <script src="sen.se Peanut.js"></script>
      <script>
       
@@ -253,11 +253,13 @@
        });
       
       
+      //ist das hier koppeln???
        function onConnectButtonClick(event) {
          let mac = event.target.dataset.mac;
          activePeanut = peanuts.find(peanut => peanut.mac == mac);
          updateButtonsColor(event.target);
        }
+      
        function updateButtonsColor(button) {
          let color = getComputedStyle(button).getPropertyValue('color');
          for (const actionButton of document.querySelectorAll('#dashboard > button')) {
@@ -284,6 +286,8 @@
          })
          .catch(e => { log('Error: ' + e); });
        });
+      
+      
        function handleNotifications(data, peanut) {
          if (data.temperatureCelsius) {
            let item = {
@@ -309,6 +313,8 @@
          data.peanutColor = peanut.color;
          log(timeStamp + ' ' + JSON.stringify(data));
        }
+      
+      
        function log(text) {
          document.querySelector('#console').innerHTML += text + '<br/>';
          document.querySelector('#console').scrollTop += 100;
@@ -371,6 +377,9 @@
            peanut.chart.draw(peanut.data, peanut.chartOptions);
          }
        }
+      
+      //function ensures that, the actual date time are similar to timeStamps in the chart,
+      //the rows are shown and are similar to the peanut data
        function updateChart(peanut, timeStampMs, data) {
          let dateTime = new Date(timeStampMs);
          peanut.data.addRows([ [dateTime, data] ]);
@@ -378,11 +387,15 @@
          peanut.chart.draw(peanut.data, peanut.chartOptions);
        }
       
-      
+      //onresize, calls an event handler when the browser window is scaled down or elgarged 
        window.onresize = function() {
          for (const peanut of peanuts) {
+          //get the size of elements
+          //with property clientWidth
            peanut.chartOptions.width = document.body.clientWidth;
+          //with property innerHeight
            peanut.chartOptions.height = (window.innerHeight - 224) / 2;
+          //draw, peanut data and peanut options
            peanut.chart.draw(peanut.data, peanut.chartOptions);
          }
        }
