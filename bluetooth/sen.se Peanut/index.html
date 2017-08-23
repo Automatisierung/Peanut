@@ -195,6 +195,7 @@
            peanut.label = MY_PEANUTS[macAddress].label;
          })
         //parameterless arrow function, methods for checking
+        //look into sen.se Peanut.js
          .then(_ => peanut.getPlainText())
          .then(clearText => peanut.setFactoryCipher(peanut.factoryKey, clearText))
          .then(_ => peanut.setTime())
@@ -248,12 +249,12 @@
              }
            }
           })
-        //Exception: Displayed an error
+        //Exception: Displayed error
          .catch(e => { log('Error: ' + e); });
        });
       
       
-      //ist das hier koppeln???
+      //
        function onConnectButtonClick(event) {
          let mac = event.target.dataset.mac;
          activePeanut = peanuts.find(peanut => peanut.mac == mac);
@@ -266,38 +267,60 @@
            actionButton.style.color = color;
          }
        }
+      //the querySelector()method scans the document for an element using the CSS selector #battery and returns the element that match
+      //An eventHandler is registered for the button-element
        document.querySelector('#battery').addEventListener('click', function() {
+      //Output to the display
          log('Getting battery...');
+      //Access to paired peanut battery data 
          activePeanut.getBattery()
+      //calls the function handleNotifications 
          .then(data => handleNotifications(data, activePeanut))
+      // Returns 0 if no element is found and 'Error' on the display
          .catch(e => { log('Error: ' + e); });
        });
+      //the querySelector()method scans the document for an element using the CSS selector #temperature and returns the element that match
+      //An eventHandler is registered for the button-element
        document.querySelector('#temperature').addEventListener('click', function() {
+      //Output to the display
          log('Getting temperature...');
+      //Access to paired peanut temperature data
          activePeanut.getTemperature()
+      //calls the function handleNotifications
          .then(data => handleNotifications(data, activePeanut))
+      // Returns 0 if no element is found and 'Error' on the display
          .catch(e => { log('Error: ' + e); });
        });
+      
+      //the querySelector()method scans the document for an element using the CSS selector #buzz and returns the element that match
+      //An eventHandler is registered for the button-element
        document.querySelector('#buzz').addEventListener('click', function() {
+      //Output to the display   
          log('Requesting buzz...');
+      //Access to paired peanut temperature data
          activePeanut.buzz()
          .then(_ => {
+       //Output to the display
            log('Buzz!');
          })
+       // Returns 0 if no element is found and 'Error' on the display
          .catch(e => { log('Error: ' + e); });
        });
       
       
        function handleNotifications(data, peanut) {
+        //  defined Color, Mac adress and local Temperature in Celsius of the actual paired peanut in an item
          if (data.temperatureCelsius) {
            let item = {
              peanutColor: peanut.color,
              peanutMac: peanut.mac,
              temperatureCelsius: data.temperatureCelsius,
            }
-           
+           //Converts the value of the data from the storage of the peanut (color, Mac address and temperature) to JSON format
            localStorage.setItem(data.timeStampMs, JSON.stringify(item));
+          //Update the graph with acuate time data and temperature data of the paired peanut
            updateChart(peanut, data.timeStampMs, data.temperatureCelsius);
+          //
          } else if (data.alert) {
            let item = {
              peanutColor: peanut.color,
