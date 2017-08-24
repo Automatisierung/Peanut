@@ -320,46 +320,57 @@
            localStorage.setItem(data.timeStampMs, JSON.stringify(item));
           //Update the graph with acuate time data and temperature data of the paired peanut
            updateChart(peanut, data.timeStampMs, data.temperatureCelsius);
-          //
          } else if (data.alert) {
+          //defined Color, Mac adress and alert of the actual paired peanut in an item
            let item = {
              peanutColor: peanut.color,
              peanutMac: peanut.mac,
              alert: data.alert,
            }
-           
+           ////Converts the value of the data from the storage of the peanut to JSON format
            localStorage.setItem(data.timeStampMs, JSON.stringify(item));
            updateChart(peanut, data.timeStampMs, data.alert);
          }
+        //Define timestamp of the Peanuts as current value
          let timeStamp = new Date(data.timeStampMs).toLocaleString();
          delete(data.timeStampMs);
          data.peanutColor = peanut.color;
+        //Display "new" timestamp
          log(timeStamp + ' ' + JSON.stringify(data));
        }
       
-      
+      // function "text edition"
        function log(text) {
+        //change the text of an element with id = 'console'
          document.querySelector('#console').innerHTML += text + '<br/>';
+        //get the number of pixels (100) that the element`s content with id  'console' is scrolled vertically 
          document.querySelector('#console').scrollTop += 100;
        }
        
       //Google Charts
+      //Load the latest official elease of Google charts
        google.charts.load('current', {packages: ['corechart']});
+      
        function drawChart(peanut) {
          const div = document.createElement('div');
          div.id = peanut.color + peanut.mac.split(':').join('');
          $('#charts').appendChild(div);
         
+        //create a new Dataable and then populate it with 
+        //datetime and time of peanut
+        //actual temperature (=number), "peanut symbol" and peanut name
          peanut.data = new google.visualization.DataTable();
          peanut.data.addColumn('datetime', 'Time');
          peanut.data.addColumn('number', '🥜 ' + peanut.label);
+        
+        //
          for (var i = 0, len = localStorage.length; i < len; i++) {
            let dateTime = new Date(parseInt(localStorage.key(i)));
            let item = JSON.parse(localStorage.getItem(localStorage.key(i)));
            if (item.peanutMac === peanut.mac) {
              if (item.temperatureCelsius) {
                let temperature = parseFloat(item.temperatureCelsius);
-              
+            
                peanut.data.addRows([ [dateTime, temperature] ]);
               
              } else if (item.alert) {
@@ -368,34 +379,44 @@
              }
            }
          }
+        //*****Thermo Peanuts*****
          if (peanut.type == 'thermo') {
+          //Create a LINE chart
            peanut.chart = new google.visualization.LineChart($('#' + div.id));
-           
+          //Chart options for Peanut
           peanut.chartOptions = {
+           //Value at missing values (points) is guessed & added
              interpolateNulls: true,
              fontName: 'Roboto',
              curveType: 'function',
              colors: [peanut.rgbColor],
+           //width and height depend from document and window
              width: document.body.clientWidth,
              height: (window.innerHeight - 224) / 2,
              legend: 'none',
               lineWidth: 3,
+           // object to configure various vertical axis elements
+           // displays values in (°C) Celsius with 5 ° C steps from 15.00 to 40.00 at chart
+           // "Border line" at 35.00 with the color deep blue
               vAxis: {     
                 format: '#.## °C',
                 ticks: [15.00, 20.00, 25.00, 30.00, 35.00, 40.00],
                 baseline: 35.00,
                 baselineColor: '#120172'
               },
+           //object to configure various horizontal axis elements
               hAxis: {
+               // displays gridlines in the colour grey at chart
                 gridlines: { 
                  color: '#fff'
                }
              }
            };
-           peanut.chart.vielColumns = []; 
+          
+           //peanut.chart.vielColumns = []; 
          } //if-von thermoPeanut Klammer
         
-        
+        // 
          if (peanut.data.getNumberOfRows()) {
            peanut.chart.draw(peanut.data, peanut.chartOptions);
          }
