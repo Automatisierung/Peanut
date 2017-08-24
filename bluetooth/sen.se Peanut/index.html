@@ -254,13 +254,14 @@
        });
       
       
-      //
+      //function, which triggers when button connect
        function onConnectButtonClick(event) {
          let mac = event.target.dataset.mac;
          activePeanut = peanuts.find(peanut => peanut.mac == mac);
          updateButtonsColor(event.target);
        }
       
+      //function, which adjusts the color of the buttons of the color of the respective Peanuts
        function updateButtonsColor(button) {
          let color = getComputedStyle(button).getPropertyValue('color');
          for (const actionButton of document.querySelectorAll('#dashboard > button')) {
@@ -363,18 +364,24 @@
          peanut.data.addColumn('datetime', 'Time');
          peanut.data.addColumn('number', '🥜 ' + peanut.label);
         
-        //
+        //iterate through all items in the store
+        //returns an integer representing the number of stored items
          for (var i = 0, len = localStorage.length; i < len; i++) {
+          //restore the new Date (acutal date) from the local storage
            let dateTime = new Date(parseInt(localStorage.key(i)));
+          //to read the data, read the item as string then convert to JSON object
            let item = JSON.parse(localStorage.getItem(localStorage.key(i)));
            if (item.peanutMac === peanut.mac) {
              if (item.temperatureCelsius) {
+              //converts the temperature from peanut (string) to be passed in a number and returns it as a numeric value 
                let temperature = parseFloat(item.temperatureCelsius);
-            
+            //add data rows ( datetime and temperature) after calling the constructor
                peanut.data.addRows([ [dateTime, temperature] ]);
-              
+            //
              } else if (item.alert) {
+              //reads a string argument and returns an integer
                let data = parseInt(item.alert);
+            //add data rows (datetime and data) after calling the constructor
                peanut.data.addRows([ [dateTime, data] ]);
              }
            }
@@ -416,7 +423,7 @@
            //peanut.chart.vielColumns = []; 
          } //if-von thermoPeanut Klammer
         
-        // 
+        // returns the number of rows in the table and then draw the chart with all data
          if (peanut.data.getNumberOfRows()) {
            peanut.chart.draw(peanut.data, peanut.chartOptions);
          }
